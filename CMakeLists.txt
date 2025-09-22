@@ -12,7 +12,8 @@ find_package(Drogon CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        Drogon::Drogon
+)
