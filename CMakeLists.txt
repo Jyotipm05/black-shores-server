@@ -12,7 +12,6 @@ find_package(Drogon CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/IpCollector.cpp
         src/IpCollector.h
 )
 
