@@ -23,12 +23,23 @@
    ```
    build/black-shores-server.exe
    ```
-2. Enter the IP address and port when prompted. Example:
-   ```
-   127.0.0.1
-   8080
-   ```
-   - If you want to use localhost, just press Enter for IP and enter a valid port.
+2. When prompted, choose where to host the server:
+   - Type `1` for local network (auto-detects your IP).
+   - Type `2` for host machine only (localhost, default).
+   - Type `3` for custom IP (enter your own IP address).
+   - Press Enter to select the default (2).
+3. Enter the port number when prompted (default is `5555`).
+   - Press Enter to use the default port.
+   - Valid ports are 1-65535. Invalid input will use the default.
+
+**Example session:**
+```
+Do you want to host it on local network🛜[1] or host machine only💻[2] or custom🛠️[3]?
+Type 1, 2, or 3 and press enter (default is 2): 1
+Hosting on local network. Current IP: 192.168.1.100
+Enter port number (default is 5555): 8080
+listener added on http://192.168.1.100:8080
+```
 
 ## Troubleshooting
 
@@ -49,4 +60,3 @@ listener added on 127.0.0.1:8080
 ## Additional Resources
 - [Drogon Documentation](https://github.com/drogonframework/drogon)
 - [vcpkg Documentation](https://github.com/microsoft/vcpkg)
-
