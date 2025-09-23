@@ -1,5 +1,31 @@
 # Black Shores Server
 
+Copyright (c) 2025 jmbab
+
+## Project Structure
+
+```
+black-shores-server/
+├── CMakeLists.txt
+├── README.md
+├── vcpkg.json
+├── build/
+│   ├── black-shores-server.exe
+│   ├── ...
+├── config/
+│   ├── config1.json
+│   ├── localhost.crt
+│   └── localhost.key
+├── src/
+│   ├── dotenv.hpp
+│   ├── IpCollector.h
+│   └── main.cpp
+├── webapp/
+│   └── root/
+│       └── index.html
+└── ...
+```
+
 ## Build Instructions
 
 1. **Install vcpkg and Drogon:**
@@ -19,18 +45,20 @@
 
 ## Usage
 
-1. Run the server executable:
-   ```
-   build/black-shores-server.exe
-   ```
-2. When prompted, choose where to host the server:
-   - Type `1` for local network (auto-detects your IP).
-   - Type `2` for host machine only (localhost, default).
-   - Type `3` for custom IP (enter your own IP address).
-   - Press Enter to select the default (2).
-3. Enter the port number when prompted (default is `5555`).
-   - Press Enter to use the default port.
-   - Valid ports are 1-65535. Invalid input will use the default.
+Run the server executable:
+```
+build/black-shores-server.exe
+```
+
+When prompted:
+- Type `1` for local network (auto-detects your IP).
+- Type `2` for host machine only (localhost, default).
+- Type `3` for custom IP (enter your own IP address).
+- Press Enter to select the default (2).
+
+Enter the port number when prompted (default is `5555`).
+- Press Enter to use the default port.
+- Valid ports are 1-65535. Invalid input will use the default.
 
 **Example session:**
 ```
@@ -39,7 +67,23 @@ Type 1, 2, or 3 and press enter (default is 2): 1
 Hosting on local network. Current IP: 192.168.1.100
 Enter port number (default is 5555): 8080
 listener added on http://192.168.1.100:8080
+listener added on https://192.168.1.100:8080
 ```
+
+## Drogon HTML File Location
+
+Place your static HTML files in:
+```
+webapp/root/
+```
+For example, `webapp/root/index.html` will be served as the root page.
+
+## HTTPS & Custom IP
+
+- The server supports HTTPS using certificates from `config/localhost.crt` and `config/localhost.key` by default.
+- You can specify custom certificate paths and document root via environment variables in `.env`:
+  - `CRT_PATH`, `KEY_PATH`, `ROOT_DIR`
+- The IP address is chosen interactively at startup.
 
 ## Troubleshooting
 
@@ -51,6 +95,12 @@ listener added on http://192.168.1.100:8080
 - **Cannot find Drogon headers:**
   - Make sure you use the correct toolchain file in your CMake command.
   - Example: `-DCMAKE_TOOLCHAIN_FILE="D:/vcpkg/scripts/buildsystems/vcpkg.cmake"`
+- **Event loop error:**
+  - Ensure `app().run()` is called only from the main thread.
+  - **Port errors:**
+      - Use ports in the range 1-65535.
+- **Missing files:**
+    - Ensure certificate and HTML files exist at the specified paths.
 
 ## Example Output
 ```

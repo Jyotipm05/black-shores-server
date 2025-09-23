@@ -5,7 +5,9 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
+#include <cstdlib>
 #include "IpCollector.h"
+#include "dotenv.hpp"
 
 using namespace drogon;
 using namespace std;
@@ -13,9 +15,11 @@ namespace fs = std::filesystem;
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
+    dotenv::init("../.env");
     cout << "Do you want to host it on local network🛜[1] or host machine only💻[2] or custom🛠️[3]?" << endl;
     cout << "Type 1, 2, or 3 and press enter (default is 2): ";
-    string temp, ipAddress = "";
+    string temp;
+    string ipAddress;
     getline(cin, temp);
     int option = 2; // default
     try {
@@ -51,28 +55,36 @@ int main() {
         }
     }
     cout << "Enter port number (default is 5555): ";
-    getline(cin, temp="");
-    int port = temp == "" ? 5555 : stoi(temp);
+    getline(cin, temp);
+    int port = temp.empty() ? 5555 : stoi(temp);
     if (port < 0 || port > 65535) port = 5555;
 
-    // Improved config loading
     string configPath = "../config/config.json";
-	cout << fs::current_path() << endl;
-    if (!fs::exists(configPath)) {
-        cerr << "Config file not found at: " << configPath << endl;
-    } else {
-        try {
-            app().loadConfigFile(configPath);
-            cout << "Loaded config from: " << configPath << endl;
-        } catch (const std::exception& ex) {
-            cerr << "Failed to load config: " << ex.what() << endl;
+    cout << fs::current_path() << endl;
+
+    string crt = dotenv::getenv("CRT_PATH", "../config/localhost.crt");
+    string key = dotenv::getenv("KEY_PATH", "../config/localhost.key");
+    string doc_root = dotenv::getenv("ROOT_DIR", "../webapp/root");
+    for (const auto& i : initializer_list<string>{crt, key, doc_root}) {
+        if (!fs::exists(i)) {
+            cerr << "Error: File or directory not found - " << i << endl;
         }
     }
-
-    app().addListener(ipAddress.c_str(), port);
-    app().setSSLFiles("../config/localhost.crt", "../config/localhost.key");
+    try {
+        app().addListener(ipAddress.c_str(), port, true, crt, key);
+    } catch (const std::exception& ex) {
+        cerr << "Failed to add listener: " << ex.what() << endl;
+        return 1;
+    }
+    app().setDocumentRoot(doc_root);
     cout << "listener added on http://" << ipAddress << ":" << port << endl;
     cout << "listener added on https://" << ipAddress << ":" << port << endl;
+    // try {
+    //     app().run(); // Must be called from main thread only
+    // } catch (const std::exception& ex) {
+    //     cerr << "Server run failed: " << ex.what() << endl;
+    //     return 1;
+    // }
     app().run();
     return 0;
 }
