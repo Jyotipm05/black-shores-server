@@ -4,10 +4,12 @@
 #include <Drogon/Drogon.h>
 #include <iostream>
 #include <string>
+#include <filesystem>
 #include "IpCollector.h"
 
 using namespace drogon;
 using namespace std;
+namespace fs = std::filesystem;
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
@@ -52,8 +54,25 @@ int main() {
     getline(cin, temp="");
     int port = temp == "" ? 5555 : stoi(temp);
     if (port < 0 || port > 65535) port = 5555;
+
+    // Improved config loading
+    string configPath = "../config/config.json";
+	cout << fs::current_path() << endl;
+    if (!fs::exists(configPath)) {
+        cerr << "Config file not found at: " << configPath << endl;
+    } else {
+        try {
+            app().loadConfigFile(configPath);
+            cout << "Loaded config from: " << configPath << endl;
+        } catch (const std::exception& ex) {
+            cerr << "Failed to load config: " << ex.what() << endl;
+        }
+    }
+
     app().addListener(ipAddress.c_str(), port);
+    app().setSSLFiles("../config/localhost.crt", "../config/localhost.key");
     cout << "listener added on http://" << ipAddress << ":" << port << endl;
+    cout << "listener added on https://" << ipAddress << ":" << port << endl;
     app().run();
     return 0;
 }
