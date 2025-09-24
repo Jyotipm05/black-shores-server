@@ -16,6 +16,7 @@ build/
 config/
 .vs/
 out/
+webapp/root/black-shores-home
 .env
 
 # CLion
