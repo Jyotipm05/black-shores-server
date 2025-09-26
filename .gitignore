@@ -10,12 +10,12 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
-build/
-.idea/
-.code/
-config/
-.vs/
-out/
+build
+.idea
+.code
+config
+.vs
+out
 webapp/root/black-shores-home
 .env
 
