@@ -14,6 +14,8 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
         src/IpCollector.h
         src/dotenv.hpp
+        src/create_cert.cpp
+        src/create_cert.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

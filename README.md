@@ -35,18 +35,18 @@ black-shores-server/
 2. **Configure CMake with vcpkg toolchain:**
    - Find your vcpkg installation path (e.g., `D:/vcpkg`).
    - Run:
-     ```
+     ```bash
      cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="D:/vcpkg/scripts/buildsystems/vcpkg.cmake"
      ```
    - Build:
-     ```
+     ```bash
      cmake --build build
      ```
 
 ## Usage
 
 Run the server executable:
-```
+```bash
 build/black-shores-server.exe
 ```
 
