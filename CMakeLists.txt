@@ -16,6 +16,12 @@ add_executable(${PROJECT_NAME}
         src/dotenv.hpp
         src/create_cert.cpp
         src/create_cert.hpp
+        src/controllers/home.cpp
+        src/controllers/home.h
+        src/controllers/RootCtrl.cpp
+        src/controllers/RootCtrl.h
+        src/WebSockets/ChatWS.cpp
+        src/WebSockets/ChatWS.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
