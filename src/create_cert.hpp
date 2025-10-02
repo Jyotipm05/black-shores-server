@@ -15,7 +15,7 @@ private:
     static void handleCAKey(std::string ca_key = "../config/ca-key.pem");
     static void handleCSR(std::string csr = "../config/cert.csr");
     static void handleKey(std::string key = "../config/cert-key.pem");
-    static void addEXTFile(std::string IPAdress);
+    static void addEXTFile(std::string& IPAdress);
 };
 
 #endif // CREATE_CERT_HPP
