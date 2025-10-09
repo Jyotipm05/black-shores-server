@@ -22,6 +22,8 @@ add_executable(${PROJECT_NAME}
         src/controllers/RootCtrl.h
         src/WebSockets/ChatWS.cpp
         src/WebSockets/ChatWS.h
+        src/controllers/CritExit.cpp
+        src/controllers/CritExit.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

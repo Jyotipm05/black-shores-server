@@ -5,16 +5,24 @@
 #ifndef BLACK_SHORES_SERVER_IPCOLLECTOR_H
 #define BLACK_SHORES_SERVER_IPCOLLECTOR_H
 #include <string>
-#include <iostream>
-#include <string>
+// #include <iostream>
+// #include <string>
+#if defined(_WIN32) || defined(_WIN64)
+#define WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h> // For Windows
 #include <ws2tcpip.h> // For Windows
+#elif defined(__linux__)
+#include <unistd.h> // For Linux
+#include <netdb.h>  // For Linux
+#include <arpa/inet.h> // For Linux
+#elif defined(__APPLE__)
+#include <unistd.h> // For macOS
+#include <netdb.h>  // For macOS
+#include <arpa/inet.h> // For macOS
+#endif
+#if defined(_WIN32) || defined(_WIN64)
 #pragma comment(lib, "ws2_32.lib") // Link with ws2_32.lib for Windows
-
-// For Linux/macOS, use these headers:
-// #include <unistd.h>
-// #include <netdb.h>
-// #include <arpa/inet.h>
+#endif
 
 class IpCollector {
 public:

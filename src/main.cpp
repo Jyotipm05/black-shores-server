@@ -98,7 +98,7 @@ int main() {
     }
     app().setDocumentRoot(doc_root);
     app().setLogPath("../logs");
-    app().setLogLevel(trantor::Logger::LogLevel::kWarn);
+    app().setLogLevel(trantor::Logger::LogLevel::kDebug);
     cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << ":" << port << endl;
     cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << ":" << port << "/chat" << endl;
     app().run();
