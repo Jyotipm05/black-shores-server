@@ -20,8 +20,7 @@ std::string CertCreator::key;
 std::string CertCreator::passphrase;
 
 
-class Color {
-public:
+namespace Color {
     static string Green(string text) {
         return "\033[32m" + text + "\033[0m";
     }

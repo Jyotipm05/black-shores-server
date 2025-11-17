@@ -12,18 +12,18 @@ find_package(Drogon CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/IpCollector.h
+        src/IpCollector.hpp
         src/dotenv.hpp
         src/create_cert.cpp
         src/create_cert.hpp
         src/controllers/home.cpp
-        src/controllers/home.h
+        src/controllers/home.hpp
         src/controllers/RootCtrl.cpp
-        src/controllers/RootCtrl.h
+        src/controllers/RootCtrl.hpp
         src/WebSockets/ChatWS.cpp
         src/WebSockets/ChatWS.h
         src/controllers/CritExit.cpp
-        src/controllers/CritExit.h
+        src/controllers/CritExit.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

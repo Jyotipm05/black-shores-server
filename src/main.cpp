@@ -2,12 +2,12 @@
 // Created by jmbab on 22-09-2025.
 //
 #include <Drogon/Drogon.h>
-#include <Drogon/HttpAppFramework.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <filesystem>
 // #include <cstdlib>
-#include "IpCollector.h"
+#include "IpCollector.hpp"
 #include "dotenv.hpp"
 #include "create_cert.hpp"
 
@@ -92,13 +92,13 @@ int main() {
     //ii) *** setting up server ***
     if (useSSL) {
         CertCreator::getInstance().create_cert(ipAddress, port);
-        app().addListener(ipAddress.c_str(), port, true, crt, key);
+        app().addListener(ipAddress, port, true, crt, key);
     } else {
-        app().addListener(ipAddress.c_str(), port);
+        app().addListener(ipAddress, port);
     }
     app().setDocumentRoot(doc_root);
     app().setLogPath("../logs");
-    app().setLogLevel(trantor::Logger::LogLevel::kDebug);
+    app().setLogLevel(trantor::Logger::LogLevel::kFatal);
     cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << ":" << port << endl;
     cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << ":" << port << "/chat" << endl;
     app().run();

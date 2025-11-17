@@ -1,4 +1,4 @@
-#include "CritExit.h"
+#include "CritExit.hpp"
 
 void CritExit::asyncHandleHttpRequest(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback)
 {

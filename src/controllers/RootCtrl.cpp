@@ -1,4 +1,4 @@
-#include "RootCtrl.h"
+#include "RootCtrl.hpp"
 
 void RootCtrl::asyncHandleHttpRequest(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback)
 {
