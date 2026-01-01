@@ -5,25 +5,55 @@ Copyright (c) 2025 jmbab
 ## Project Structure
 
 ```
-black-shores-server/
-├── CMakeLists.txt
-├── README.md
-├── vcpkg.json
-├── build/
-│   ├── black-shores-server.exe
-│   ├── ...
-├── config/
-│   ├── config1.json
-│   ├── localhost.crt
-│   └── localhost.key
-├── src/
-│   ├── dotenv.hpp
-│   ├── IpCollector.h
-│   └── main.cpp
-├── webapp/
-│   └── root/
-│       └── index.html
-└── ...
+`black-shores-server/`
+├── `CMakeLists.txt`
+├── `README.md`
+├── `ssl-certificates_writeup.md`
+├── `vcpkg.json`
+├── `build/`
+├── `config/`
+│   ├── `ca-key.pem`
+│   ├── `ca.pem`
+│   ├── `ca.srl`
+│   ├── `cert-key.pem`
+│   ├── `cert.csr`
+│   ├── `cert.pem`
+│   ├── `config1.json`
+│   └── `extfile.cnf`
+├── `logs/`
+├── `src/`
+│   ├── `create_cert.cpp`
+│   ├── `create_cert.hpp`
+│   ├── `dotenv.hpp`
+│   ├── `IpCollector.hpp`
+│   ├── `main.cpp`
+│   ├── `pathFinder.hpp`
+│   ├── `controllers/`
+│   │   ├── `CritExit.cpp`
+│   │   ├── `CritExit.hpp`
+│   │   ├── `home.cpp`
+│   │   ├── `home.hpp`
+│   │   ├── `PathManager.hpp`
+│   │   ├── `RootCtrl.cpp`
+│   │   └── `RootCtrl.hpp`
+│   ├── `Filters/`
+│   ├── `UI/`
+│   │   ├── `components.hpp`
+│   │   ├── `nav.hpp`
+│   │   └── `style.hpp`
+│   └── `WebSockets/`
+│       ├── `ChatWS.cpp`
+│       └── `ChatWS.h`
+├── `webapp/`
+│   └── `root/`
+│       ├── `index.html`
+│       ├── `vite.svg`
+│       └── `assets/`
+│           ├── `_required_.js`
+│           ├── `_required_.css`
+│           └── ...
+└── `...`
+
 ```
 
 ## Build Instructions

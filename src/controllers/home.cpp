@@ -3,6 +3,7 @@
 //
 
 #include "home.hpp"
+#include "PathManager.hpp"
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpAppFramework.h>
 #include <thread>
@@ -14,7 +15,8 @@ void home::handleHome(const drogon::HttpRequestPtr &req,
     // Use C++ native threading system
     std::thread worker([callback]() {
         // Create the response in the worker thread
-        auto page = drogon::HttpResponse::newFileResponse("../webapp/root/index.html");
+        PathManager &pm = PathManager::instance();
+        auto page = drogon::HttpResponse::newFileResponse(pm.getRootPath() + "/webapp/root/index.html");
         page->setContentTypeCode(drogon::CT_TEXT_HTML);
         page->setStatusCode(drogon::k200OK);
         callback(page);

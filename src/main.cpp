@@ -10,6 +10,8 @@
 #include "IpCollector.hpp"
 #include "dotenv.hpp"
 #include "create_cert.hpp"
+#include "pathFinder.hpp"
+#include "controllers/PathManager.hpp"
 
 using namespace drogon;
 using namespace std;
@@ -18,6 +20,9 @@ namespace fs = std::filesystem;
 int main() {
     //initial setup
     SetConsoleOutputCP(CP_UTF8);
+    fs::path cp = fs::current_path();
+    cout << "Current working directory: " << cp << endl;
+    system("cd");
     dotenv::init("../.env");
     //input
     //1) ip address and port-------------------------------------------------------
@@ -65,12 +70,6 @@ int main() {
         }
     }
 
-    //iii) *** port ***
-    cout << "Enter port number (default is 5555): ";
-    getline(cin, temp);
-    int port = temp.empty() ? 5555 : stoi(temp);
-    if (port < 0 || port > 65535) port = 5555; //port range check
-
     //iv) *** SSL ***
     bool useSSL = false;
     cout << "Do you want to enable SSL? (y/n, default is n): ";
@@ -78,29 +77,46 @@ int main() {
     if (temp == "y" || temp == "Y") useSSL = true;
     else useSSL = false;
 
+    //iii) *** port ***
+    cout << "Enter port number (default is " << (useSSL ? 443 : 80) << "): ";
+    getline(cin, temp);
+    int port = temp.empty() ? (useSSL ? 443 : 80) : stoi(temp);
+    if (port < 0 || port > 65535) port = (useSSL ? 443 : 80); //port range check
+
 
     //2)setup server------------------------------------------
     //i) *** Checking all files and directories ***
-    string crt = dotenv::getenv("CRT_PATH", "../config/cert.csr");
-    string key = dotenv::getenv("KEY_PATH", "../config/cert-key.pem");
-    string doc_root = dotenv::getenv("ROOT_DIR", "../webapp/root");
+    fs::path root_dir = findParent(dotenv::getenv("CNF_DIR", "config"));
+    string root = root_dir.string();
+    PathManager::instance().setRootPath(root);
+    string crt = root + "\\" + dotenv::getenv("CRT_PATH", "config\\cert.csr");
+    string key = root + "\\" + dotenv::getenv("KEY_PATH", "config\\cert-key.pem");
+    string doc_root = root + "\\" + dotenv::getenv("ROOT_DIR", "webapp\\root");
     for (const auto &i: initializer_list<string>{crt, key, doc_root}) {
         if ((useSSL && (i == crt || i == key)) && !fs::exists(i)) {
             cerr << "Error: File or directory not found - " << i << endl;
         }
     }
     //ii) *** setting up server ***
+    doc_root = reSlash(doc_root);
+    string log_root = root + "\\logs";
+    log_root = reSlash(log_root);
+    crt = reSlash(crt);
+    key = reSlash(key);
+
     if (useSSL) {
-        CertCreator::getInstance().create_cert(ipAddress, port);
+        CertCreator::getInstance().create_cert(ipAddress, port, root);
         app().addListener(ipAddress, port, true, crt, key);
     } else {
         app().addListener(ipAddress, port);
     }
+
     app().setDocumentRoot(doc_root);
-    app().setLogPath("../logs");
+    app().setLogPath(log_root);
     app().setLogLevel(trantor::Logger::LogLevel::kFatal);
-    cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << ":" << port << endl;
-    cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << ":" << port << "/chat" << endl;
+    string p_str = ((useSSL && port == 443) || (!useSSL && port == 80)) ? "" : (":" + to_string(port));
+    cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << p_str << endl;
+    cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << p_str << "/chat" << endl;
     app().run();
     return 0;
 }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0.0)
+cmake_minimum_required(VERSION 3.31.6)
 project(black-shores-server VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
@@ -24,6 +24,11 @@ add_executable(${PROJECT_NAME}
         src/WebSockets/ChatWS.h
         src/controllers/CritExit.cpp
         src/controllers/CritExit.hpp
+        src/UI/style.hpp
+        src/UI/components.hpp
+        src/UI/nav.hpp
+        src/pathFinder.hpp
+        src/controllers/PathManager.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
