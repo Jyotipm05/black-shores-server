@@ -12,6 +12,11 @@
 #include "create_cert.hpp"
 #include "pathFinder.hpp"
 #include "controllers/PathManager.hpp"
+// linux ubuntu or debian
+#ifdef __linux__
+#include <locale>
+#endif
+
 
 using namespace drogon;
 using namespace std;
@@ -19,7 +24,11 @@ namespace fs = std::filesystem;
 
 int main() {
     //initial setup
+#if defined(_WIN32) || defined(_WIN64)
     SetConsoleOutputCP(CP_UTF8);
+#elif defined(__linux__)
+    std::locale::global(std::locale("C.UTF-8"));
+#endif
     fs::path cp = fs::current_path();
     cout << "Current working directory: " << cp << endl;
     system("cd");
@@ -89,9 +98,9 @@ int main() {
     fs::path root_dir = findParent(dotenv::getenv("CNF_DIR", "config"));
     string root = root_dir.string();
     PathManager::instance().setRootPath(root);
-    string crt = root + "\\" + dotenv::getenv("CRT_PATH", "config\\cert.csr");
-    string key = root + "\\" + dotenv::getenv("KEY_PATH", "config\\cert-key.pem");
-    string doc_root = root + "\\" + dotenv::getenv("ROOT_DIR", "webapp\\root");
+    string crt = root + "/" + dotenv::getenv("CRT_PATH", "config/cert.csr");
+    string key = root + "/" + dotenv::getenv("KEY_PATH", "config/cert-key.pem");
+    string doc_root = root + "/" + dotenv::getenv("ROOT_DIR", "webapp/root");
     for (const auto &i: initializer_list<string>{crt, key, doc_root}) {
         if ((useSSL && (i == crt || i == key)) && !fs::exists(i)) {
             cerr << "Error: File or directory not found - " << i << endl;
@@ -113,7 +122,7 @@ int main() {
 
     app().setDocumentRoot(doc_root);
     app().setLogPath(log_root);
-    app().setLogLevel(trantor::Logger::LogLevel::kFatal);
+    app().setLogLevel(trantor::Logger::LogLevel::kTrace);
     string p_str = ((useSSL && port == 443) || (!useSSL && port == 80)) ? "" : (":" + to_string(port));
     cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << p_str << endl;
     cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << p_str << "/chat" << endl;

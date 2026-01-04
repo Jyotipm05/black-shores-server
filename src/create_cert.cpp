@@ -33,6 +33,10 @@ namespace Color {
     static string Yellow(string text) {
         return "\033[33m" + text + "\033[0m";
     }
+
+    static string Blue(string text) {
+        return "\033[34m" + text + "\033[0m";
+    }
 };
 
 CertCreator::CertCreator(string pass) {
@@ -56,23 +60,35 @@ void CertCreator::create_cert(string IPAddress, int port, const string &root) {
     // system(
     //     ("cd ../config; openssl x509 -req -sha256 -days 365 -in cert.csr -CA ca.pem -CAkey ca-key.pem -out cert.pem -extfile extfile.cnf -CAcreateserial -passin pass:\""
     //      + passphrase + "\"").c_str());
+#if defined(_WIN32) || defined(_WIN64)
     system(
         ("cd /d \"" + root + "\" && cd config &&" +
          " openssl x509 -req -sha256 -days 365 -in cert.csr -CA ca.pem -CAkey ca-key.pem -out cert.pem -extfile extfile.cnf -CAcreateserial -passin pass:\""
          + passphrase + "\"").c_str());
+#elif defined(__linux__)
+    system(
+        ("cd \"" + root + "\" && cd config &&" +
+         " openssl x509 -req -sha256 -days 365 -in cert.csr -CA ca.pem -CAkey ca-key.pem -out cert.pem -extfile extfile.cnf -CAcreateserial -passin pass:\""
+         + passphrase + "\"").c_str());
+#endif
 }
 
 void CertCreator::handleCACertificate(std::string ca) {
     if (fs::exists(ca)) {
         cout << Color::Green(ca + " exists.") << endl;
     } else {
-        cout << Color::Red(ca) << Color::Yellow(" Creating one.") << endl;
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
+        cout << Color::Red(ca + " does not exist.") << Color::Yellow(" Creating one.") << endl;
         string conf = root + "/config";
+#if defined(_WIN32) || defined(_WIN64)
         system(
-            ("cd /d " + conf +
-             " && openssl req -x509 -new -nodes -keyout ca-key.pem -sha256 -days 1024 -out ca.pem -subj \"/C=IN/ST=WB/L=KGP/O=Black_Shores/CN=Black_Shores\" -passin pass:"
-             + passphrase + "\"")
+            ("cd /d \"" + conf +
+             "\" && openssl req -x509 -new -key ca-key.pem -sha256 -days 1024 -out ca.pem -subj \"/C=IN/ST=WB/L=KGP/O=Black_Shores/CN=Black_Shores\" -passin pass:\"" + passphrase + "\"")
+            .c_str()
+        );
+#elif defined(__linux__)
+        system(
+            ("cd \"" + conf +
+             "\" && openssl req -x509 -new -key ca-key.pem -sha256 -days 1024 -out ca.pem -subj \"/C=IN/ST=WB/L=KGP/O=Black_Shores/CN=Black_Shores\" -passin pass:\"" + passphrase + "\"")
             .c_str()
         );
 #else
@@ -84,16 +100,20 @@ void CertCreator::handleCACertificate(std::string ca) {
 
 void CertCreator::handleCAKey(std::string ca_key) {
     if (fs::exists(ca_key)) {
-        cout << ca_key << " exists." << endl;
+        cout << Color::Green(ca_key + " exists.") << endl;
     } else {
-        cout << ca_key << " does not exist. Creating one." << endl;
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
+        cout << Color::Red(ca_key + " does not exist.") << Color::Yellow(" Creating one.") << endl;
+#if defined(_WIN32) || defined(_WIN64)
         system(
-            (
-                "cd /d \"" + root + "/config\" && openssl genrsa -aes256-out ca-key.pem 4096 -passout pass:\"" +
-                passphrase +
-                "\""
-            ).c_str()
+            ("cd /d \"" + root + "/config\" && openssl genpkey -algorithm RSA -aes256 -pass pass:\"" +
+             passphrase + "\" -out ca-key.pem -pkeyopt rsa_keygen_bits:4096")
+            .c_str()
+        );
+#elif defined(__linux__)
+        system(
+            ("cd \"" + root + "/config\" && openssl genpkey -algorithm RSA -aes256 -pass pass:\"" +
+             passphrase + "\" -out ca-key.pem -pkeyopt rsa_keygen_bits:4096")
+            .c_str()
         );
 #else
         cout << "Please create a CA certificate manually and place it at " << ca_key << endl;
@@ -103,13 +123,19 @@ void CertCreator::handleCAKey(std::string ca_key) {
 
 void CertCreator::handleCSR(std::string cert) {
     if (fs::exists(cert)) {
-        cout << cert << " exists." << endl;
+        cout << Color::Green(cert + " exists.") << endl;
     } else {
-        cout << cert << " does not exist. Creating one." << endl;
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
+        cout << Color::Red(cert + " does not exist.") << Color::Yellow(" Creating one.") << endl;
+#if defined(_WIN32) || defined(_WIN64)
         system(
             ("cd /d \"" + root +
              "/config\" && openssl req -new -sha256 -subj \"/CN=Black Shores\" -key cert-key.pem -out cert.csr -passin pass:\""
+             + passphrase + "\"").c_str()
+        );
+#elif defined(__linux__)
+        system(
+            ("cd \"" + root +
+             "/config\" && openssl req -new -sha256 -subj '/CN=Black Shores' -key cert-key.pem -out cert.csr -passin pass:\""
              + passphrase + "\"").c_str()
         );
 #else
@@ -120,11 +146,13 @@ void CertCreator::handleCSR(std::string cert) {
 
 void CertCreator::handleKey(std::string key) {
     if (fs::exists(key)) {
-        cout << key << " exists." << endl;
+        cout << Color::Green(key + " exists.") << endl;
     } else {
-        cout << key << " does not exist. Creating one." << endl;
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
-        system(("cd " + root + "/config && openssl genrsa -out cert-key.pem 4096").c_str());
+        cout << Color::Red(key + " does not exist.") << Color::Yellow(" Creating one.") << endl;
+#if defined(_WIN32) || defined(_WIN64)
+        system(("cd /d \"" + root + "/config\" && openssl genpkey -algorithm RSA -out cert-key.pem -pkeyopt rsa_keygen_bits:4096").c_str());
+#elif defined(__linux__)
+        system(("cd \"" + root + "/config\" && openssl genpkey -algorithm RSA -out cert-key.pem -pkeyopt rsa_keygen_bits:4096").c_str());
 #else
         cout << "Please create a CA certificate manually and place it at " << key << endl;
 #endif
