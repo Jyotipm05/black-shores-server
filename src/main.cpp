@@ -98,7 +98,7 @@ int main() {
     fs::path root_dir = findParent(dotenv::getenv("CNF_DIR", "config"));
     string root = root_dir.string();
     PathManager::instance().setRootPath(root);
-    string crt = root + "/" + dotenv::getenv("CRT_PATH", "config/cert.csr");
+    string crt = root + "/" + dotenv::getenv("CRT_PATH", "config/cert.pem");
     string key = root + "/" + dotenv::getenv("KEY_PATH", "config/cert-key.pem");
     string doc_root = root + "/" + dotenv::getenv("ROOT_DIR", "webapp/root");
     for (const auto &i: initializer_list<string>{crt, key, doc_root}) {
@@ -122,7 +122,7 @@ int main() {
 
     app().setDocumentRoot(doc_root);
     app().setLogPath(log_root);
-    app().setLogLevel(trantor::Logger::LogLevel::kTrace);
+    app().setLogLevel(trantor::Logger::LogLevel::kFatal);
     string p_str = ((useSSL && port == 443) || (!useSSL && port == 80)) ? "" : (":" + to_string(port));
     cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << p_str << endl;
     cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << p_str << "/chat" << endl;
