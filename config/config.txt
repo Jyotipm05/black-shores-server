@@ -1,0 +1,1 @@
+This config folder contains all the SSL certificates.
