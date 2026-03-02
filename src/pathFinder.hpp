@@ -7,7 +7,7 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-inline fs::path findParent(string target) {
+inline fs::path findParent(const string& target) {
     fs::path p = fs::current_path();
     while (!fs::exists(p / target)) {
         p = p.parent_path();
@@ -18,7 +18,7 @@ inline fs::path findParent(string target) {
     return p;
 }
 
-string reSlash(string path) {// replace all '\\' with '/'
+inline string reSlash(string path) {// replace all '\\' with '/'
     for (size_t i = 0; i < path.length(); i++) {
         if (path[i] == '\\') {
             path[i] = '/';

@@ -4,7 +4,6 @@
 #include <Drogon/Drogon.h>
 #include <iostream>
 #include <string>
-#include <vector>
 #include <filesystem>
 // #include <cstdlib>
 #include "IpCollector.hpp"
@@ -12,17 +11,20 @@
 #include "create_cert.hpp"
 #include "pathFinder.hpp"
 #include "controllers/PathManager.hpp"
+#include "GetIPv4IPv6.hpp"
 // linux ubuntu or debian
 #ifdef __linux__
 #include <locale>
 #endif
-
+import Data_Manager;
 
 using namespace drogon;
-using namespace std;
+using std::cout, std::cerr, std::endl, std::string, std::vector, dm::DataManager;
 namespace fs = std::filesystem;
+void showLink(IPAddress& ip, int& port, bool ssl);
 
-int main() {
+int main(int argc, char *argv[]) {
+    vector<string> args(argv, argv + argc);
     //initial setup
 #if defined(_WIN32) || defined(_WIN64)
     SetConsoleOutputCP(CP_UTF8);
@@ -33,6 +35,7 @@ int main() {
     cout << "Current working directory: " << cp << endl;
     system("cd");
     dotenv::init("../.env");
+    /*
     //input
     //1) ip address and port-------------------------------------------------------
     //i) *** IP address ***
@@ -83,15 +86,24 @@ int main() {
     bool useSSL = false;
     cout << "Do you want to enable SSL? (y/n, default is n): ";
     getline(cin, temp);
-    if (temp == "y" || temp == "Y") useSSL = true;
-    else useSSL = false;
+    if (temp == "y" || temp == "Y") { useSSL = true; } else { useSSL = false; }
 
     //iii) *** port ***
     cout << "Enter port number (default is " << (useSSL ? 443 : 80) << "): ";
     getline(cin, temp);
     int port = temp.empty() ? (useSSL ? 443 : 80) : stoi(temp);
     if (port < 0 || port > 65535) port = (useSSL ? 443 : 80); //port range check
+    */
 
+    bool useSSL = false;
+    vector<IPAddress> ips;
+    vector<int> ports; {
+        DataManager dataManager(useSSL, ports);
+        dataManager.acquireData(args, argc);
+        ips = dataManager.getIPs();
+        useSSL = dataManager.getSSL();
+        ports = dataManager.getPorts();
+    }
 
     //2)setup server------------------------------------------
     //i) *** Checking all files and directories ***
@@ -114,18 +126,30 @@ int main() {
     key = reSlash(key);
 
     if (useSSL) {
-        CertCreator::getInstance().create_cert(ipAddress, port, root);
-        app().addListener(ipAddress, port, true, crt, key);
+        CertCreator::getInstance().create_cert(ips[0].address, ports[0], root);
+        app().addListener(ips[0].address, ports[0], true, crt, key);
     } else {
-        app().addListener(ipAddress, port);
+        app().addListener(ips[0].address, ports[0]);
+    }
+
+    for (size_t i = 1; i < ips.size() && i < ports.size(); ++i) {
+        app().addListener(ips[i].address, ports[i]);
     }
 
     app().setDocumentRoot(doc_root);
     app().setLogPath(log_root);
     app().setLogLevel(trantor::Logger::LogLevel::kFatal);
-    string p_str = ((useSSL && port == 443) || (!useSSL && port == 80)) ? "" : (":" + to_string(port));
-    cout << "listener added on " << (useSSL ? "https://" : "http://") << ipAddress << p_str << endl;
-    cout << "WebSocket added on " << (useSSL ? "wss://" : "ws://") << ipAddress << p_str << "/chat" << endl;
+    showLink(ips[0], ports[0], useSSL);
+    for (size_t i = 1; i < ips.size() && i < ports.size(); ++i) {
+        showLink(ips[i], ports[i], useSSL);
+    }
     app().run();
     return 0;
+}
+
+void showLink(IPAddress& ip, int& port, bool ssl = false) {
+    string p_str = ((ssl && port == 443) || (!ssl && port == 80)) ? "" : (":" + to_string(port));
+    p_str = (ip.version==IP::IPv6)?("["+ip.address+"]"+p_str): (ip.address + p_str);
+    cout << "Listener added on " << (ssl ? "https://" : "http://") << p_str << endl;
+    cout << "WebSocket added on " << (ssl ? "wss://" : "ws://") << p_str << "/chat" << endl;
 }

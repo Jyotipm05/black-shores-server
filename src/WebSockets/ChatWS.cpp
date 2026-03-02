@@ -1,4 +1,4 @@
-#include "ChatWS.h"
+#include "ChatWS.hpp"
 #include <iostream>
 
 using namespace std;
@@ -6,7 +6,7 @@ using namespace std;
 void ChatWS::handleNewMessage(const WebSocketConnectionPtr &wsConnPtr, std::string &&message,
                               const WebSocketMessageType &type) {
     // write your application logic here
-    if (message != "")
+    if (!message.empty())
         cout << message << endl;
     wsConnPtr->send("Thank You");
 }
