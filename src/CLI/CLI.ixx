@@ -3,15 +3,15 @@ module;
 #include <vector>
 #include <utility>
 #include <iostream>
-#include <functional>
 #include <variant>
 #include <map>
+#include <unordered_map>
 #include <ranges>
-export module CLI;
+export module Data_Manager:CLI;
 
-using std::string;
+using std::string, std::conditional_t;
 
-namespace cli {
+export namespace cli {
     export struct param {
         std::string alpha, beta;
         std::string val;
@@ -28,16 +28,19 @@ namespace cli {
         }
 
         bool operator==(const string &str) const {
-            return alpha == str || beta == str;
+            return str == alpha || str == beta;
         }
     };
 
-    export class CLI {
+    export template <bool reserve=false,int N=0>
+    class CLI {
+        using nmap = std::conditional_t<reserve, std::unordered_map<string, param>, std::map<string, param>>;
+        nmap params;
     public:
-        CLI() = default;
-
-        explicit CLI(int n) {
-            // params.reserve(n + 1);
+        CLI() {
+            if constexpr (reserve) {
+                params.reserve(N + 1);
+            }
         }
 
         void expire() = delete;
@@ -49,7 +52,7 @@ namespace cli {
 
         void parse(const std::vector<std::string> &args, const int &argc) {
             for (size_t i = 0; i < argc; ++i) {
-                for (auto &val: params | std::views::values) {
+                for (auto &[key, val]: params) {
                     if (val == args[i]) {
                         if (i + 1 < argc && args[i + 1][0] != '-') {
                             // Check if next argument is a value
@@ -69,8 +72,5 @@ namespace cli {
             }
             return "";
         }
-
-    private:
-        std::map<string, param> params;
     };
 }

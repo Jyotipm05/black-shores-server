@@ -26,8 +26,8 @@ enum IP {
 };
 
 struct IPAddress {
-    IP version; // "IPv4" or "IPv6"
     std::string address;
+    IP version; // "IPv4" or "IPv6"
 };
 /*
 inline std::vector<IPAddress> getLocalIPs() {
@@ -61,7 +61,7 @@ inline std::vector<IPAddress> getLocalIPs() {
             } else continue;
 
             if (inet_ntop(p->ai_family, addr, ipstr, sizeof(ipstr))) {
-                foundAddresses.push_back({ver, std::string(ipstr)});
+                foundAddresses.push_back({std::string(ipstr), ver});
             }
         }
         freeaddrinfo(res);
@@ -86,7 +86,7 @@ inline std::vector<IPAddress> getLocalIPs() {
 
 inline vector<IPAddress> getLocalIPs() {
     vector<IPAddress> foundAddresses;
-    foundAddresses.emplace_back(IPv4, "127.0.0.1");
-    foundAddresses.emplace_back(IPv6, "::1");
+    foundAddresses.emplace_back("127.0.0.1", IPv4);
+    foundAddresses.emplace_back("::1", IPv6);
     return foundAddresses;
 }

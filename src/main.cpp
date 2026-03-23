@@ -96,13 +96,15 @@ int main(int argc, char *argv[]) {
     */
 
     bool useSSL = false;
-    vector<IPAddress> ips;
-    vector<int> ports; {
-        DataManager dataManager(useSSL, ports);
+    IPAddress ip;
+    int port = -1;
+    bool local = false;{
+        DataManager dataManager(useSSL, port);
         dataManager.acquireData(args, argc);
-        ips = dataManager.getIPs();
+        ip = dataManager.getIP();
         useSSL = dataManager.getSSL();
-        ports = dataManager.getPorts();
+        port = dataManager.getPort();
+        local = dataManager.getHost();
     }
 
     //2)setup server------------------------------------------
@@ -125,24 +127,23 @@ int main(int argc, char *argv[]) {
     crt = reSlash(crt);
     key = reSlash(key);
 
-    if (useSSL) {
-        CertCreator::getInstance().create_cert(ips[0].address, ports[0], root);
-        app().addListener(ips[0].address, ports[0], true, crt, key);
-    } else {
-        app().addListener(ips[0].address, ports[0]);
+    {
+        if (!ip.address.empty()){
+            if (useSSL) {
+                CertCreator::getInstance().create_cert(ip.address, port, root);
+                app().addListener(ip.address, port, true, crt, key);
+            } else {
+                app().addListener(ip.address, port);
+            }
+        }
     }
 
-    for (size_t i = 1; i < ips.size() && i < ports.size(); ++i) {
-        app().addListener(ips[i].address, ports[i]);
-    }
+        app().addListener("127.0.0.1", 80);
 
     app().setDocumentRoot(doc_root);
     app().setLogPath(log_root);
     app().setLogLevel(trantor::Logger::LogLevel::kFatal);
-    showLink(ips[0], ports[0], useSSL);
-    for (size_t i = 1; i < ips.size() && i < ports.size(); ++i) {
-        showLink(ips[i], ports[i], useSSL);
-    }
+    showLink(ip, port, useSSL);
     app().run();
     return 0;
 }

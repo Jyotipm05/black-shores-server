@@ -11,6 +11,7 @@ add_library(src STATIC
         GetIPv4IPv6.hpp
         IpCollector.hpp
         pathFinder.hpp
+        IPvalidator.hpp
 )
 
 add_executable(black-shores-server main.cpp)

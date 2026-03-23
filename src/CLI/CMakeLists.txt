@@ -11,5 +11,6 @@ target_link_libraries(CLI PRIVATE
 target_sources(CLI PUBLIC
         FILE_SET CXX_MODULES FILES
         CLI.ixx
+        TUI.ixx
         Data_Manager.ixx
 )
