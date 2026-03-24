@@ -21,7 +21,8 @@ import Data_Manager;
 using namespace drogon;
 using std::cout, std::cerr, std::endl, std::string, std::vector, dm::DataManager;
 namespace fs = std::filesystem;
-void showLink(IPAddress& ip, int& port, bool ssl);
+
+void showLink(const IPAddress &ip, const int &port, bool ssl);
 
 int main(int argc, char *argv[]) {
     vector<string> args(argv, argv + argc);
@@ -98,7 +99,7 @@ int main(int argc, char *argv[]) {
     bool useSSL = false;
     IPAddress ip;
     int port = -1;
-    bool local = false;{
+    bool local = false; {
         DataManager dataManager(useSSL, port);
         dataManager.acquireData(args, argc);
         ip = dataManager.getIP();
@@ -125,20 +126,23 @@ int main(int argc, char *argv[]) {
     string log_root = root + "\\logs";
     log_root = reSlash(log_root);
     crt = reSlash(crt);
-    key = reSlash(key);
-
-    {
-        if (!ip.address.empty()){
+    key = reSlash(key); {
+        if (!ip.address.empty()) {
+            // Make a const copy to prevent mutations through Drogon's internal handling
+            const string ip_copy = ip.address;
             if (useSSL) {
-                CertCreator::getInstance().create_cert(ip.address, port, root);
-                app().addListener(ip.address, port, true, crt, key);
+                CertCreator::getInstance().create_cert(ip_copy, port, root);
+                app().addListener(ip_copy, port, true, crt, key);
             } else {
-                app().addListener(ip.address, port);
+                app().addListener(ip_copy, port);
             }
         }
     }
 
+    if (local) {
+        // Use literal to avoid any reference aliasing issues
         app().addListener("127.0.0.1", 80);
+    }
 
     app().setDocumentRoot(doc_root);
     app().setLogPath(log_root);
@@ -148,9 +152,9 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void showLink(IPAddress& ip, int& port, bool ssl = false) {
+void showLink(const IPAddress &ip, const int &port, bool ssl) {
     string p_str = ((ssl && port == 443) || (!ssl && port == 80)) ? "" : (":" + to_string(port));
-    p_str = (ip.version==IP::IPv6)?("["+ip.address+"]"+p_str): (ip.address + p_str);
+    p_str = (ip.version == IP::IPv6) ? ("[" + ip.address + "]" + p_str) : (ip.address + p_str);
     cout << "Listener added on " << (ssl ? "https://" : "http://") << p_str << endl;
     cout << "WebSocket added on " << (ssl ? "wss://" : "ws://") << p_str << "/chat" << endl;
 }

@@ -14,14 +14,10 @@ set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 
 
 find_package(Drogon CONFIG REQUIRED)
-find_package(jwt-cpp CONFIG REQUIRED)
-find_package(PostgreSQL REQUIRED)
 
 add_subdirectory(src)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Drogon::Drogon
-        jwt-cpp::jwt-cpp
-        PostgreSQL::PostgreSQL
         src
 )
