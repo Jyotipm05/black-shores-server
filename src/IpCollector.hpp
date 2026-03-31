@@ -26,7 +26,7 @@
 
 class IpCollector {
 public:
-    std::string getIP() {
+    static std::string getIP() {
 #ifdef _WIN32
         WSADATA wsaData;
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {

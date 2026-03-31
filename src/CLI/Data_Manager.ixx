@@ -11,10 +11,6 @@ export module Data_Manager;
 import :CLI;
 import :TUI;
 
-namespace cli {
-    struct param;
-}
-
 using std::string, std::cout, std::cerr, std::endl, std::vector, std::format;
 
 bool isInteger(const string &s);

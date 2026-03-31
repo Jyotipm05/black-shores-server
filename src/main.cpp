@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-// #include <cstdlib>
 #include "IpCollector.hpp"
 #include "dotenv.hpp"
 #include "create_cert.hpp"
@@ -141,7 +140,9 @@ int main(int argc, char *argv[]) {
 
     if (local) {
         // Use literal to avoid any reference aliasing issues
-        app().addListener("127.0.0.1", 80);
+        string local_ip = "127.0.0.1";
+        int port_ = 80;
+        app().addListener(local_ip, port_);
     }
 
     app().setDocumentRoot(doc_root);

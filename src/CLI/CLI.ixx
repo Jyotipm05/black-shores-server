@@ -11,7 +11,7 @@ export module Data_Manager:CLI;
 
 using std::string, std::conditional_t;
 
-export namespace cli {
+namespace cli {
     export struct param {
         std::string alpha, beta;
         std::string val;
