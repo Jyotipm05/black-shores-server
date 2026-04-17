@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
         string local_ip = "127.0.0.1";
         int port_ = 80;
         app().addListener(local_ip, port_);
+        
     }
 
     app().setDocumentRoot(doc_root);
